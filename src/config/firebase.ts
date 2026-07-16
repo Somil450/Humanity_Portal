@@ -4,16 +4,15 @@ import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import { getFunctions } from 'firebase/functions';
 
-// ─── Firebase Configuration ─────────────────────────────────────────────────
-// TODO: Replace these values with your Firebase project config from:
-// Firebase Console → Project Settings → Your apps → SDK setup & configuration
-const firebaseConfig = {
-  apiKey: 'YOUR_API_KEY',
-  authDomain: 'YOUR_AUTH_DOMAIN',
-  projectId: 'YOUR_PROJECT_ID',
-  storageBucket: 'YOUR_STORAGE_BUCKET',
-  messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
-  appId: 'YOUR_APP_ID',
+// ─── Firebase Configuration (taskmate-somil project) ───────────────────────
+export const firebaseConfig = {
+  apiKey: 'AIzaSyBXk2Ejmkjg_MNmw2wG5HvP6645PCnPIWM',
+  authDomain: 'taskmate-somil-81c1b.firebaseapp.com',
+  projectId: 'taskmate-somil-81c1b',
+  storageBucket: 'taskmate-somil-81c1b.firebasestorage.app',
+  messagingSenderId: '405265620356',
+  appId: '1:405265620356:web:382825c4bb419cf69711d1',
+  measurementId: 'G-SYPK0FVY5H',
 };
 
 // ─── Initialize Firebase (prevent duplicate initialization in hot reload) ───

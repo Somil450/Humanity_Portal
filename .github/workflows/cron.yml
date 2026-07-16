@@ -1,0 +1,47 @@
+name: Cron Jobs
+
+on:
+  schedule:
+    # Run daily at 18:30 UTC (00:00 IST)
+    - cron: '30 18 * * *'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  run-daily:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: npm install firebase-admin nodemailer
+        working-directory: ./cron
+      - name: Run daily job
+        run: node daily-job.js
+        working-directory: ./cron
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+
+  run-monthly:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: npm install firebase-admin nodemailer
+        working-directory: ./cron
+      - name: Run monthly job
+        # Note: We run it every day at 14:30 UTC (20:00 IST) but the script itself checks if it's the last day of the month.
+        run: node monthly-report.js
+        working-directory: ./cron
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}

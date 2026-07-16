@@ -52,12 +52,14 @@ export interface User {
   fullName: string;
   email: string;
   role: UserRole;
+  status: 'active' | 'inactive' | 'pending';
   department?: string;
-  status: UserStatus;
-  isTracked: boolean;
   phone?: string;
   address?: string;
   startDate?: string;
+  isTracked?: boolean;
+  severity?: number;
+  netScore?: number;
   profilePhoto?: string;   // Firebase Storage URL
   onboarding?: OnboardingData;
   clickupUserId?: string;
@@ -329,10 +331,13 @@ export type MoreStackParamList = {
   Notifications: undefined;
   People: undefined;
   EmployeeProfile: { employeeId: string };
+  CreateEmployee: undefined;
+  CreateProject: undefined;
   UrgentTasks: undefined;
   LeaveManagement: undefined;
   AdminDashboard: undefined;
   EmployeeOversight: undefined;
+  ProjectWorkspace: undefined;
   DailyTasksReview: undefined;
   Settings: undefined;
 };

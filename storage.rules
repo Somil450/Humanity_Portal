@@ -1,0 +1,31 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Onboarding documents — user can upload their own
+    match /onboarding/{userId}/{docType}/{fileName} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Profile photos
+    match /profiles/{userId}/{fileName} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Attendance screenshots
+    match /attendance/{userId}/{date}/{fileName} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Leave documents
+    match /leaves/{userId}/{leaveId}/{fileName} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Urgent task attachments — any authenticated user
+    match /urgentTasks/{taskId}/attachments/{fileName} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

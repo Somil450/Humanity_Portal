@@ -1,0 +1,110 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Helper Functions ──────────────────────────────────────────────────
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function hasRole(roles) {
+      return isAuthenticated() && getUserData().role in roles;
+    }
+
+    function isAdminOrHR() {
+      return hasRole(['super_admin', 'admin', 'hr']);
+    }
+
+    function isAdmin() {
+      return hasRole(['super_admin', 'admin']);
+    }
+
+    // ─── Users Collection ──────────────────────────────────────────────────
+    match /users/{userId} {
+      allow read: if isAuthenticated();  // All authenticated users can see the directory
+      allow create: if false;            // Only Cloud Functions can create users
+      allow update: if isOwner(userId) || isAdminOrHR();
+      allow delete: if isAdmin();
+    }
+
+    // ─── Attendance Collection ─────────────────────────────────────────────
+    match /attendance/{recordId} {
+      allow read: if isAuthenticated() && (
+        isOwner(resource.data.userId) || isAdminOrHR()
+      );
+      allow create: if isAuthenticated() && (
+        isOwner(request.resource.data.userId) || isAdminOrHR()
+      );
+      allow update: if isAuthenticated() && (
+        isOwner(resource.data.userId) || isAdminOrHR()
+      );
+      allow delete: if isAdmin();
+    }
+
+    // ─── Projects Collection ───────────────────────────────────────────────
+    match /projects/{projectId} {
+      allow read: if isAuthenticated() && (
+        request.auth.uid in resource.data.members || isAdminOrHR()
+      );
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && (
+        request.auth.uid in resource.data.members || isAdminOrHR()
+      );
+      allow delete: if isAdmin();
+    }
+
+    // ─── Tasks Collection ──────────────────────────────────────────────────
+    match /tasks/{taskId} {
+      allow read: if isAuthenticated() && (
+        request.auth.uid in resource.data.assignees || isAdminOrHR()
+      );
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && (
+        request.auth.uid in resource.data.assignees || isAdminOrHR()
+      );
+      allow delete: if isAdmin();
+    }
+
+    // ─── Urgent Tasks Collection ───────────────────────────────────────────
+    match /urgentTasks/{taskId} {
+      allow read: if isAuthenticated() && (
+        request.auth.uid in resource.data.assignees ||
+        request.auth.uid == resource.data.assignedBy ||
+        isAdminOrHR()
+      );
+      allow create: if isAdminOrHR() || hasRole(['manager']);
+      allow update: if isAuthenticated() && (
+        request.auth.uid in resource.data.assignees ||
+        request.auth.uid == resource.data.assignedBy ||
+        isAdminOrHR()
+      );
+      allow delete: if isAdmin();
+    }
+
+    // ─── Leaves Collection ─────────────────────────────────────────────────
+    match /leaves/{leaveId} {
+      allow read: if isAuthenticated() && (
+        isOwner(resource.data.userId) || isAdminOrHR()
+      );
+      allow create: if isAuthenticated() && isOwner(request.resource.data.userId);
+      allow update: if isAdminOrHR();  // Only HR/admin can approve/decline
+      allow delete: if isAdmin();
+    }
+
+    // ─── Notifications Collection ──────────────────────────────────────────
+    match /notifications/{notifId} {
+      allow read: if isAuthenticated() && isOwner(resource.data.recipientId);
+      allow create: if isAuthenticated() || isAdmin();
+      allow update: if isAuthenticated() && isOwner(resource.data.recipientId);
+      allow delete: if isOwner(resource.data.recipientId) || isAdmin();
+    }
+  }
+}
