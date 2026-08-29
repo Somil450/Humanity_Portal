@@ -6,13 +6,13 @@ import { getFunctions } from 'firebase/functions';
 
 // ─── Firebase Configuration (taskmate-somil project) ───────────────────────
 export const firebaseConfig = {
-  apiKey: 'AIzaSyBXk2Ejmkjg_MNmw2wG5HvP6645PCnPIWM',
-  authDomain: 'taskmate-somil-81c1b.firebaseapp.com',
-  projectId: 'taskmate-somil-81c1b',
-  storageBucket: 'taskmate-somil-81c1b.firebasestorage.app',
-  messagingSenderId: '405265620356',
-  appId: '1:405265620356:web:382825c4bb419cf69711d1',
-  measurementId: 'G-SYPK0FVY5H',
+  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
 // ─── Initialize Firebase (prevent duplicate initialization in hot reload) ───

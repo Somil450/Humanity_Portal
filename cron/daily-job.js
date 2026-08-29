@@ -149,7 +149,20 @@ const runDailyJob = async () => {
   process.exit(0);
 };
 
-runDailyJob().catch(err => {
+runDailyJob().catch(async err => {
   console.error('❌ Daily job failed:', err);
+  if (process.env.ADMIN_EMAIL && process.env.EMAIL_USER) {
+    try {
+      await transporter.sendMail({
+        from: `"One Humanity Portal Cron" <${process.env.EMAIL_USER}>`,
+        to: process.env.ADMIN_EMAIL,
+        subject: `🚨 CRON JOB FAILED: Daily Job`,
+        text: `The daily cron job failed with the following error:\n\n${err.message}\n\nStack Trace:\n${err.stack}`
+      });
+      console.log('Failure email sent to admin.');
+    } catch (mailErr) {
+      console.error('Failed to send failure email:', mailErr);
+    }
+  }
   process.exit(1);
 });

@@ -116,7 +116,20 @@ const runMonthlyJob = async () => {
   process.exit(0);
 };
 
-runMonthlyJob().catch(err => {
+runMonthlyJob().catch(async err => {
   console.error('❌ Monthly job failed:', err);
+  if (process.env.ADMIN_EMAIL && process.env.EMAIL_USER) {
+    try {
+      await transporter.sendMail({
+        from: `"One Humanity Portal Cron" <${process.env.EMAIL_USER}>`,
+        to: process.env.ADMIN_EMAIL,
+        subject: `🚨 CRON JOB FAILED: Monthly Report`,
+        text: `The monthly report cron job failed with the following error:\n\n${err.message}\n\nStack Trace:\n${err.stack}`
+      });
+      console.log('Failure email sent to admin.');
+    } catch (mailErr) {
+      console.error('Failed to send failure email:', mailErr);
+    }
+  }
   process.exit(1);
 });
